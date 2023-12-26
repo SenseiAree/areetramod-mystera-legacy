@@ -1,2 +1,3 @@
 # areetramod mystera legacy
- A Simple Modded UI of Mystera Legacy to alter the frontend only. This Mod can track your passwords if needed so use wisely.
+ A Simple Modded UI of Mystera Legacy to alter the frontend only. This Mod can track your passwords if needed, so use wisely. For user reference, the javascript code of Mystera Legacy UI has been pasted in the folder named reference. Please note that the reference file is not used or owned by the author and is not responsible for any mishaps if altered.
+ Kindly use only the supplied source code in the src folder. The application is still under development and is on early access. You can check for regular updates in this Git repository. Thanks for using the mod. Happy Gaming.
