@@ -111,7 +111,7 @@ var fixCompassText = function(){
                     skillname += last_status.charAt(i);
                 }
                 
-                skill_status.title.text = skillname.charAt(0).toUpperCase() + skillname.substring(1) + ": " + (Math.round(exp_status.val * 100) / 100) + "%";
+                skill_status.title.text = skillname.charAt(0).toUpperCase() + skillname.substring(1) + ": " + (Math.round(skill_status.val * 100) / 100) + "%";
             }
         }else{
             hp_status.title.text = "Health";
