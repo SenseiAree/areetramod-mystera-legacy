@@ -103,7 +103,16 @@ var fixCompassText = function(){
             hp_status.title.text = "Hp: " + (Math.round(hp_status.val * 100) / 100) + "%";
             hunger_status.title.text = "Food: " + (Math.round(hunger_status.val * 10) / 10) + "%";
             exp_status.title.text = "Exp: " + (Math.round(exp_status.val * 100) / 100) + "%";
-            skill_status.title.text = Math.round(skill_status.val * 100) / 100  + "%";
+            let skillname = "";
+            if(last_status != undefined){
+
+                for(let i = 0; i < last_status.length; i++){
+                    if(last_status.charAt(i) >= '0' && last_status.charAt(i) <= '9') break;
+                    skillname += last_status.charAt(i);
+                }
+                
+                skill_status.title.text = skillname.charAt(0).toUpperCase() + skillname.substring(1) + ": " + (Math.round(exp_status.val * 100) / 100) + "%";
+            }
         }else{
             hp_status.title.text = "Health";
             hunger_status.title.text = "Food";
