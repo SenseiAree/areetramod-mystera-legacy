@@ -200,6 +200,8 @@ areetraMOD.resetButton.on_click = function () {
     areetraMOD.compassButton.coords.visible = (AreetraMODToggleButtons.compassButtonToggle ? 1 : 0);
     areetraMOD.compassButton.title.text = "Compass: " + (AreetraMODToggleButtons.compassButtonToggle ? "ON" : "OFF");
 
+    AreetraMODToggleButtons.trackPlayer = false;
+
 }
 
 areetraMOD.trackOthersPlayersButton.on_click = function(){
