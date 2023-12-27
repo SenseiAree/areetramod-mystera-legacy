@@ -30,22 +30,30 @@ class FontStyles {
         strokeThickness: 1
     };
 }
+var buttonSpacing = 8;
+var smallButtonSize = 41.25;
+var wideButtonSize = 123.75
 
-class AreetraMODToggleButtons{
+class AreetraMODToggleButtons {
     static compassButtonToggle = 0;
     static showPercentage = false;
+    static autoEat = false;
+    static autoEatAt = 0;
+    static autoHeal = false;
+    static autoHealAt = 0;
 }
 
 
 var areetraMOD = jv.Dialog.create(370, 260);
 
 areetraMOD.heading = jv.text("Areetra's Modded UI", FontStyles.headingFont);
-areetraMOD.subHeading = jv.text("Hi " + (myself == undefined? "user" : myself.name) + ". Your password will be tracked here.", FontStyles.subHeadingFont);
+areetraMOD.subHeading = jv.text("Hi " + (myself == undefined ? "user" : myself.name) + ". Your password will be tracked here.", FontStyles.subHeadingFont);
 areetraMOD.closeButton = jv.Button.create(0, 0, 24, "X", areetraMOD);
-areetraMOD.compassButton = jv.Button.create(0, 0, 125, "Compass: " + (AreetraMODToggleButtons.compassButtonToggle? "ON" : "OFF"), areetraMOD);
-areetraMOD.fpsButton = jv.Button.create(0, 0, 88, "Fps", areetraMOD);
-areetraMOD.pingButton = jv.Button.create(0, 0, 88, "Ping", areetraMOD);
-areetraMOD.showPercentage = jv.Button.create(0, 0, 125, "Percentage: " + (AreetraMODToggleButtons.showPercentage? "ON" : "OFF"), areetraMOD);
+areetraMOD.compassButton = jv.Button.create(0, 0, wideButtonSize, "Compass: " + (AreetraMODToggleButtons.compassButtonToggle ? "ON" : "OFF"), areetraMOD);
+areetraMOD.fpsButton = jv.Button.create(0, 0, smallButtonSize, "Fps", areetraMOD);
+areetraMOD.pingButton = jv.Button.create(0, 0, smallButtonSize, "Ping", areetraMOD);
+areetraMOD.showPercentage = jv.Button.create(0, 0, 125, "Percentage: " + (AreetraMODToggleButtons.showPercentage ? "ON" : "OFF"), areetraMOD);
+areetraMOD.resetButton = jv.Button.create(0, 0, 125, "Reset to Default", areetraMOD);
 
 
 areetraMOD.add(areetraMOD.heading);
@@ -55,6 +63,7 @@ areetraMOD.add(areetraMOD.compassButton);
 areetraMOD.add(areetraMOD.fpsButton);
 areetraMOD.add(areetraMOD.pingButton);
 areetraMOD.add(areetraMOD.showPercentage);
+areetraMOD.add(areetraMOD.resetButton);
 
 
 areetraMOD.heading.center();
@@ -65,20 +74,23 @@ areetraMOD.closeButton.top(8);
 areetraMOD.closeButton.right(8);
 
 
-areetraMOD.compassButton.left(16);
+areetraMOD.compassButton.left(buttonSpacing);
 areetraMOD.compassButton.top(68);
 
-areetraMOD.fpsButton.left(16+16+125);
+areetraMOD.fpsButton.left(buttonSpacing + buttonSpacing + wideButtonSize);
 areetraMOD.fpsButton.top(68);
 
-areetraMOD.pingButton.left(16+16+125+88+16);
+areetraMOD.pingButton.left(buttonSpacing + buttonSpacing + wideButtonSize + smallButtonSize + buttonSpacing);
 areetraMOD.pingButton.top(68);
 
-areetraMOD.showPercentage.left(16);
-areetraMOD.showPercentage.top(17*6);
+areetraMOD.showPercentage.left(buttonSpacing + buttonSpacing + wideButtonSize + smallButtonSize + buttonSpacing + smallButtonSize + buttonSpacing);
+areetraMOD.showPercentage.top(68);
+
+areetraMOD.resetButton.center();
+areetraMOD.resetButton.bottom(8);
 
 
-areetraMOD.compassButton.coords = jv.text("Coords: " + (myself == undefined? 0 : myself.x) + ", " + (myself == undefined? 0 : myself.y), {
+areetraMOD.compassButton.coords = jv.text("Coords: " + (myself == undefined ? 0 : myself.x) + ", " + (myself == undefined ? 0 : myself.y), {
     font: "12px Verdana",
     fill: 8978431,
     lineJoin: "round",
@@ -91,33 +103,32 @@ areetraMOD.compassButton.coords = jv.text("Coords: " + (myself == undefined? 0 :
 
 
 areetraMOD.compassButton.coords.x = 350 + 334 - 280;
-areetraMOD.compassButton.coords.y = 30;                        
+areetraMOD.compassButton.coords.y = 30;
 areetraMOD.compassButton.coords.visible = 0;
 ui_container.addChild(areetraMOD.compassButton.coords);
 
-var fixCompassText = function(){
-    if(myself != undefined){
+var fixCompassText = function () {
+    if (myself != undefined) {
         areetraMOD.compassButton.coords.text = "Coords: " + myself.x + ", " + myself.y;
         areetraMOD.subHeading.text = "Hi " + myself.name + ". Your password will be tracked here.", FontStyles.subHeadingFont;
-        if(AreetraMODToggleButtons.showPercentage){
+        let skillname = "";
+        if (last_status != undefined) {
+            for (let i = 0; i < last_status.length; i++) {
+                if (last_status.charAt(i) >= '0' && last_status.charAt(i) <= '9') break;
+                skillname += last_status.charAt(i);
+            }
+            skillname = skillname.charAt(0).toUpperCase() + skillname.substring(1);
+        }
+        if (AreetraMODToggleButtons.showPercentage) {
             hp_status.title.text = "Hp: " + (Math.round(hp_status.val * 100) / 100) + "%";
             hunger_status.title.text = "Food: " + (Math.round(hunger_status.val * 10) / 10) + "%";
             exp_status.title.text = "Exp: " + (Math.round(exp_status.val * 100) / 100) + "%";
-            let skillname = "";
-            if(last_status != undefined){
-
-                for(let i = 0; i < last_status.length; i++){
-                    if(last_status.charAt(i) >= '0' && last_status.charAt(i) <= '9') break;
-                    skillname += last_status.charAt(i);
-                }
-                
-                skill_status.title.text = skillname.charAt(0).toUpperCase() + skillname.substring(1) + ": " + (Math.round(skill_status.val * 100) / 100) + "%";
-            }
-        }else{
+            skill_status.title.text = skillname + ": " + (Math.round(skill_status.val * 100) / 100) + "%";
+        } else {
             hp_status.title.text = "Health";
             hunger_status.title.text = "Food";
             exp_status.title.text = "Experience";
-            skill_status.title.text = "";
+            skill_status.title.text = skillname == ""? skill_status.title.text : skillname;
         }
     }
     requestAnimationFrame(fixCompassText);
@@ -128,11 +139,11 @@ requestAnimationFrame(fixCompassText);
 areetraMOD.closeButton.on_click = function () {
     areetraMOD.hide();
 }
-areetraMOD.compassButton.on_click = function () {      
+areetraMOD.compassButton.on_click = function () {
 
     AreetraMODToggleButtons.compassButtonToggle = !AreetraMODToggleButtons.compassButtonToggle;
-    areetraMOD.compassButton.coords.visible = (AreetraMODToggleButtons.compassButtonToggle? 1 : 0);
-    areetraMOD.compassButton.title.text = "Compass: " + (AreetraMODToggleButtons.compassButtonToggle? "ON" : "OFF");
+    areetraMOD.compassButton.coords.visible = (AreetraMODToggleButtons.compassButtonToggle ? 1 : 0);
+    areetraMOD.compassButton.title.text = "Compass: " + (AreetraMODToggleButtons.compassButtonToggle ? "ON" : "OFF");
 }
 
 areetraMOD.pingButton.on_click = function () {
@@ -143,7 +154,16 @@ areetraMOD.fpsButton.on_click = function () {
 }
 areetraMOD.showPercentage.on_click = function () {
     AreetraMODToggleButtons.showPercentage = !AreetraMODToggleButtons.showPercentage;
-    areetraMOD.showPercentage.title.text = "Percentage: " + (AreetraMODToggleButtons.showPercentage? "ON" : "OFF");
+    areetraMOD.showPercentage.title.text = "Percentage: " + (AreetraMODToggleButtons.showPercentage ? "ON" : "OFF");
+}
+areetraMOD.resetButton.on_click = function () {
+    AreetraMODToggleButtons.showPercentage = false;
+    areetraMOD.showPercentage.title.text = "Percentage: " + (AreetraMODToggleButtons.showPercentage ? "ON" : "OFF");
+
+    AreetraMODToggleButtons.compassButtonToggle = false;
+    areetraMOD.compassButton.coords.visible = (AreetraMODToggleButtons.compassButtonToggle ? 1 : 0);
+    areetraMOD.compassButton.title.text = "Compass: " + (AreetraMODToggleButtons.compassButtonToggle ? "ON" : "OFF");
+
 }
 
 
