@@ -37,6 +37,7 @@ var wideButtonSize = 123.75
 class AreetraMODToggleButtons {
     static compassButtonToggle = 0;
     static showPercentage = false;
+    static trackPlayer = false;
     static autoEat = false;
     static autoEatAt = 0;
     static autoHeal = false;
@@ -149,16 +150,20 @@ var fixCompassText = function () {
             exp_status.title.text = "Experience";
             skill_status.title.text = skillname == ""? skill_status.title.text : skillname;
         }
-        areetraMOD.trackOthersPlayersButton.label.text = "Tracking Players\n"
-        let eachPlayerToKill = 0;
-        for(i = 0; i < mobs.items.length; i++){
-            let eachMob = mobs.items[i];
-            if((eachMob != null || eachMob != undefined) && eachMob.body != -1 && eachMob.tribe != myself.tribe && eachMob.name != myself.name){
-                areetraMOD.trackOthersPlayersButton.label.text += eachMob.name + ":" + eachMob.level + `- (${eachMob.x}, ${eachMob.y}), `;
-                if(++eachPlayerToKill %3 == 0){
-                    areetraMOD.trackOthersPlayersButton.label.text += "\n";
+        if(AreetraMODToggleButtons.trackPlayer == true){
+            areetraMOD.trackOthersPlayersButton.label.text = "Tracking Players\n";
+            let eachPlayerToKill = 0;
+            for(i = 0; i < mobs.items.length; i++){
+                let eachMob = mobs.items[i];
+                if((eachMob != null || eachMob != undefined) && eachMob.body != -1 && eachMob.tribe != myself.tribe && eachMob.name != myself.name){
+                    areetraMOD.trackOthersPlayersButton.label.text += eachMob.name + ":" + eachMob.level + `- (${eachMob.x}, ${eachMob.y}), `;
+                    if(++eachPlayerToKill %3 == 0){
+                        areetraMOD.trackOthersPlayersButton.label.text += "\n";
+                    }
                 }
             }
+        } else{
+            areetraMOD.trackOthersPlayersButton.label.text = "";
         }
 
     }
@@ -195,6 +200,10 @@ areetraMOD.resetButton.on_click = function () {
     areetraMOD.compassButton.coords.visible = (AreetraMODToggleButtons.compassButtonToggle ? 1 : 0);
     areetraMOD.compassButton.title.text = "Compass: " + (AreetraMODToggleButtons.compassButtonToggle ? "ON" : "OFF");
 
+}
+
+areetraMOD.trackOthersPlayersButton.on_click = function(){
+    AreetraMODToggleButtons.trackPlayer = !AreetraMODToggleButtons.trackPlayer;
 }
 
 
