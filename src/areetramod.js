@@ -52,8 +52,9 @@ areetraMOD.closeButton = jv.Button.create(0, 0, 24, "X", areetraMOD);
 areetraMOD.compassButton = jv.Button.create(0, 0, wideButtonSize, "Compass: " + (AreetraMODToggleButtons.compassButtonToggle ? "ON" : "OFF"), areetraMOD);
 areetraMOD.fpsButton = jv.Button.create(0, 0, smallButtonSize, "Fps", areetraMOD);
 areetraMOD.pingButton = jv.Button.create(0, 0, smallButtonSize, "Ping", areetraMOD);
-areetraMOD.showPercentage = jv.Button.create(0, 0, 125, "Percentage: " + (AreetraMODToggleButtons.showPercentage ? "ON" : "OFF"), areetraMOD);
-areetraMOD.resetButton = jv.Button.create(0, 0, 125, "Reset to Default", areetraMOD);
+areetraMOD.showPercentage = jv.Button.create(0, 0, wideButtonSize, "Percentage: " + (AreetraMODToggleButtons.showPercentage ? "ON" : "OFF"), areetraMOD);
+areetraMOD.resetButton = jv.Button.create(0, 0, wideButtonSize, "Reset to Default", areetraMOD);
+areetraMOD.trackOthersPlayersButton = jv.Button.create(0, 0, wideButtonSize, "Track Player(s)", areetraMOD);
 
 
 areetraMOD.add(areetraMOD.heading);
@@ -64,6 +65,7 @@ areetraMOD.add(areetraMOD.fpsButton);
 areetraMOD.add(areetraMOD.pingButton);
 areetraMOD.add(areetraMOD.showPercentage);
 areetraMOD.add(areetraMOD.resetButton);
+areetraMOD.add(areetraMOD.trackOthersPlayersButton);
 
 
 areetraMOD.heading.center();
@@ -89,6 +91,9 @@ areetraMOD.showPercentage.top(68);
 areetraMOD.resetButton.center();
 areetraMOD.resetButton.bottom(8);
 
+areetraMOD.trackOthersPlayersButton.top(68 + 26+ buttonSpacing)
+areetraMOD.trackOthersPlayersButton.left(8);
+
 
 areetraMOD.compassButton.coords = jv.text("Coords: " + (myself == undefined ? 0 : myself.x) + ", " + (myself == undefined ? 0 : myself.y), {
     font: "12px Verdana",
@@ -98,6 +103,14 @@ areetraMOD.compassButton.coords = jv.text("Coords: " + (myself == undefined ? 0 
     strokeThickness: 4,
     align: "right"
 });
+areetraMOD.trackOthersPlayersButton.label = jv.text("Tracking Players\n", {
+    font: "12px Verdana",
+    fill: 8978431,
+    lineJoin: "round",
+    stroke: jv.color_dark,
+    strokeThickness: 4,
+    align: "left"
+});
 
 
 
@@ -105,7 +118,13 @@ areetraMOD.compassButton.coords = jv.text("Coords: " + (myself == undefined ? 0 
 areetraMOD.compassButton.coords.x = 350 + 334 - 280;
 areetraMOD.compassButton.coords.y = 30;
 areetraMOD.compassButton.coords.visible = 0;
+
+areetraMOD.trackOthersPlayersButton.label.x = 180;
+areetraMOD.trackOthersPlayersButton.label.y = 325 - 16;
+areetraMOD.trackOthersPlayersButton.label.visible = 1;
+
 ui_container.addChild(areetraMOD.compassButton.coords);
+ui_container.addChild(areetraMOD.trackOthersPlayersButton.label);
 
 var fixCompassText = function () {
     if (myself != undefined) {
@@ -130,6 +149,18 @@ var fixCompassText = function () {
             exp_status.title.text = "Experience";
             skill_status.title.text = skillname == ""? skill_status.title.text : skillname;
         }
+        areetraMOD.trackOthersPlayersButton.label.text = "Tracking Players\n"
+        let eachPlayerToKill = 0;
+        for(i = 0; i < mobs.items.length; i++){
+            let eachMob = mobs.items[i];
+            if((eachMob != null || eachMob != undefined) && eachMob.body != -1 && eachMob.tribe != myself.tribe && eachMob.name != myself.name){
+                areetraMOD.trackOthersPlayersButton.label.text += eachMob.name + ":" + eachMob.level + `- (${eachMob.x}, ${eachMob.y}), `;
+                if(++eachPlayerToKill %3 == 0){
+                    areetraMOD.trackOthersPlayersButton.label.text += "\n";
+                }
+            }
+        }
+
     }
     requestAnimationFrame(fixCompassText);
 }
