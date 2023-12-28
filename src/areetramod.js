@@ -185,8 +185,10 @@ var fixCompassText = function () {
             });
             setTimeout(() => {
                 append("1 Healing Potion consumed. You have " + --potcount + " Healing Potions left.");
-                AreetraMODToggleButtons.healed = false;
             }, 500);
+            setTimeout(() => {
+                AreetraMODToggleButtons.healed = false;
+            }, 15000);
         }
 
     }
