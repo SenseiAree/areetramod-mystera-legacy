@@ -67,6 +67,7 @@ areetraMOD.command = function (inputText) {
 /compass - Shows Compass at all times
 /cara - Automatically eats cara when Slowed lesser than -40
 /track - Tracks players within 24 tile range
+/heal [amt] - Automatically Heals the player at [amt]% hp
 Go to Options -> Help to know more`)
             break;
         case '/percentage':
