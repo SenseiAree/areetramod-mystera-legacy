@@ -227,11 +227,11 @@ var fixCompassText = function () {
             let eachPlayerToKill = 0;
             for (i = 0; i < mobs.items.length; i++) {
                 let eachMob = mobs.items[i];
-                if ((eachMob != null || eachMob != undefined) && eachMob.body != -1 && eachMob.tribe != myself.tribe && eachMob.name != myself.name) {
+                if ((eachMob != null || eachMob != undefined) && eachMob.body != -1 && eachMob.tribe != myself.tribe && eachMob.name != myself.name && eachMob.template != "doppleganger") {                    
                     areetraMOD.trackOthersPlayersButton.label.text += eachMob.name + ":" + eachMob.level + `- (${eachMob.x}, ${eachMob.y}), `;
                     if (++eachPlayerToKill % 3 == 0) {
                         areetraMOD.trackOthersPlayersButton.label.text += "\n";
-                    }
+                    }                    
                 }
             }
         } else {
