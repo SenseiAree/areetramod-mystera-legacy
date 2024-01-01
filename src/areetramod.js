@@ -38,10 +38,19 @@ class FontStyles {
         align: "left"
     }
 }
-var buttonSpacing = 8;
-var smallButtonSize = 41.25;
-var wideButtonSize = 112.66;
-var buttonHeight = 26;
+const Spells = {
+    whirlwind: 911,
+    dash: 895,
+    diso: 909,
+    inti: 894,
+    healingRain: 910,
+    shell: 905,
+    frostbite: 903    
+}
+const buttonSpacing = 8;
+const smallButtonSize = 41.25;
+const wideButtonSize = 112.66;
+const buttonHeight = 26;
 
 class AreetraMODToggleButtons {
     static compassButtonToggle = 0;
@@ -51,6 +60,8 @@ class AreetraMODToggleButtons {
     static healed = false;
     static autoCara = false;
     static autoCarafed = false;
+    static autoDiso = false;
+    static autoDisoUsed = false;
 }
 
 
@@ -63,10 +74,11 @@ areetraMOD.command = function (inputText) {
         case '/mod':
             append(`Welcome to AreetraMOD Console. For GUI, press X. The console commands are listed below
 /mod - Shows Help
-/percentage - Shows Precised Status Bars
-/compass - Shows Compass at all times
-/cara - Automatically eats cara when Slowed lesser than -40
-/track - Tracks players within 24 tile range
+/percentage - Toggles Precised Status Bars
+/compass - Toggles Compass display at all times
+/cara - Toggles Auto-cara when Slowed lesser than -40
+/track - Toggles Tracker that tracks killable players within 24 tile range
+/diso - Toggle Auto Disorient
 /heal [amt] - Automatically Heals the player at [amt]% hp
 Go to Options -> Help to know more`)
             break;
@@ -80,7 +92,13 @@ Go to Options -> Help to know more`)
             areetraMOD.compassButton.on_click();
             break;
         case '/track':
-            areetraMOD.trackOthersPlayersButton.on_click();
+            areetraMOD.trackOthersPlayersButton.on_click();        
+            break;
+        case '/diso':
+            areetraMOD.autoDisoButton.on_click();
+            break;        
+        case '/modreset':
+            areetraMOD.resetButton.on_click();
             break;
         default:
             if(inputText.startsWith("/heal")){
@@ -125,6 +143,7 @@ areetraMOD.autoHeal = {
 }
 areetraMOD.autoHeal.amountSlider.set_percent(AreetraMODToggleButtons.autoHealAt);
 areetraMOD.autoCaraButton = jv.Button.create(0, 0, wideButtonSize, "Auto Cara: " + (AreetraMODToggleButtons.autoCara ? "ON" : "OFF"));
+areetraMOD.autoDisoButton = jv.Button.create(0, 0, wideButtonSize, "Auto Diso: " + (AreetraMODToggleButtons.autoDiso ? "ON" : "OFF"));
 
 areetraMOD.add(areetraMOD.heading);
 areetraMOD.add(areetraMOD.subHeading);
@@ -138,6 +157,7 @@ areetraMOD.add(areetraMOD.trackOthersPlayersButton);
 areetraMOD.add(areetraMOD.autoHeal.healsAtLabel);
 areetraMOD.add(areetraMOD.autoHeal.amountSlider);
 areetraMOD.add(areetraMOD.autoCaraButton);
+areetraMOD.add(areetraMOD.autoDisoButton);
 
 areetraMOD.heading.center();
 areetraMOD.subHeading.center();
@@ -167,6 +187,10 @@ areetraMOD.autoHeal.healsAtLabel.top(areetraMOD.autoHeal.amountSlider.y - areetr
 
 areetraMOD.autoCaraButton.top(areetraMOD.autoHeal.amountSlider.y + areetraMOD.autoHeal.healsAtLabel.h + buttonSpacing);
 areetraMOD.autoCaraButton.left(buttonSpacing);
+
+areetraMOD.autoDisoButton.top(areetraMOD.autoCaraButton.y);
+areetraMOD.autoDisoButton.left(areetraMOD.autoCaraButton.x + areetraMOD.autoCaraButton.w + buttonSpacing);
+
 
 areetraMOD.compassButton.coords = jv.text("Coords: " + (myself == undefined ? 0 : myself.x) + ", " + (myself == undefined ? 0 : myself.y), {
     font: "12px Verdana",
@@ -237,6 +261,41 @@ var fixCompassText = function () {
         } else {
             areetraMOD.trackOthersPlayersButton.label.text = "";
         }
+
+        if(AreetraMODToggleButtons.autoDiso === true && AreetraMODToggleButtons.autoDisoUsed == false){
+            for (i = 0; i < mobs.items.length; i++) {
+                let eachMob = mobs.items[i];
+                if ((eachMob != null || eachMob != undefined) && eachMob.body != -1 && eachMob.tribe != myself.tribe && eachMob.name != myself.name && eachMob.template != "doppleganger") {                    
+                    const xDiff = myself.x - eachMob.x;                  
+                    const xAbsDiff = Math.abs(xDiff);
+                    const yDiff = myself.y - eachMob.y;                  
+                    const yAbsDiff = Math.abs(yDiff);
+                    if((xAbsDiff == 1 && yAbsDiff == 0) || (xAbsDiff == 0 && yAbsDiff == 1)){
+                        console.log("Hello", xAbsDiff, yAbsDiff);
+                        if(jv.ability.find(a => a.spr == 909).ready == 0){
+                            AreetraMODToggleButtons.autoDisoUsed = true;
+                        }
+                        if(xDiff == 1){
+                            send({type: 'm', d: 3});
+                            // Diso Cooldown - jv.ability.find(a => a.spr == 909).cooldown
+                        } else if (xDiff == -1){
+                            send({type: 'm', d: 1});
+                        } else if (yDiff == 1){
+                            send({type: 'm', d: 0});
+                        } else if (yDiff == -1){
+                            send({type: 'm', d: 2});
+                        }
+                        jv.ability.find(a => a.spr == 909).do_click()
+                        if(jv.ability.find(a => a.spr == 909).ready == 0){
+                            setTimeout(() => {
+                                AreetraMODToggleButtons.autoDisoUsed = false;
+                            }, jv.ability.find(a => a.spr == 909).cooldown + 100)
+                        }
+                    }
+                }
+            }
+        }
+
         if (AreetraMODToggleButtons.autoHealAt > 0
             && (!AreetraMODToggleButtons.healed)
             && hp_status.val < AreetraMODToggleButtons.autoHealAt
@@ -254,7 +313,7 @@ var fixCompassText = function () {
             }, 500);
             setTimeout(() => {
                 AreetraMODToggleButtons.healed = false;
-            }, 15000);
+            }, 15100);
         }
 
 
@@ -303,7 +362,7 @@ var fixCompassText = function () {
             "A - Move left      D - Move right\n" +
             "Q - First Spell    E - Second Spell\n" +
             "R - Third Spell    T - Fourth Spell\n" +
-            "F - Fifth Spell\n\n" +
+            "F - Fifth Spell    Y - Toggles Auto-Diso\n\n" +
             "Added Controls by AreetraMOD UI\n" +
             "G - Sixth Spell    V - Toggles PVP Mode\n" +
             "X - Opens AreetraMOD UI"
@@ -393,10 +452,12 @@ areetraMOD.resetButton.on_click = function () {
     areetraMOD.compassButton.coords.visible = (AreetraMODToggleButtons.compassButtonToggle ? 1 : 0);
     areetraMOD.compassButton.title.text = "Compass: " + (AreetraMODToggleButtons.compassButtonToggle ? "ON" : "OFF");
 
+    append("The UI has been reset for screenshot purposes");
+
 }
 
 areetraMOD.trackOthersPlayersButton.on_click = function () {
-    AreetraMODToggleButtons.trackPlayer = !AreetraMODToggleButtons.trackPlayer;
+    AreetraMODToggleButtons.trackPlayer = !AreetraMODToggleButtons.trackPlayer;    
     if (AreetraMODToggleButtons.trackPlayer == true) {
         append("Your are now tracking every players within 24 tiles range that can be attacked.")
     } else {
@@ -415,6 +476,16 @@ areetraMOD.autoCaraButton.on_click = function () {
     append("Automatic Caraway has been turned " + (AreetraMODToggleButtons.autoCara ? "on" : "off"));
 }
 
+areetraMOD.autoDisoButton.on_click = function () {
+    AreetraMODToggleButtons.autoDiso = !AreetraMODToggleButtons.autoDiso;
+    areetraMOD.autoDisoButton.title.setText("Auto Diso: " + (AreetraMODToggleButtons.autoDiso ? "ON" : "OFF"));
+    if(AreetraMODToggleButtons.autoDiso){
+        append("Player will automatically use Disorient with the closest neutral player.")
+    }else{
+        append("Player will no longer use Disorient automatically");
+    }
+}
+
 
 
 var keyG = jv.keyboard(71)
@@ -429,6 +500,10 @@ keyV.press = function () {
     jv.command("/pvp");
 }
 
+var keyY = jv.keyboard(89);
+keyY.press = () => {
+    areetraMOD.autoDisoButton.on_click();
+} 
 
 var keyX = jv.keyboard(88);
 
